@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component@3.0.3/dist/aframe-event-set-component.min.js"></script>
+    <script>
+      
+      // function updateAnimation() {
+      //   const entity = document.querySelector('#animatedEntity');
+      //   const newAnimation = 'property: rotation; to: 0 720 0; dur: 4000; easing: linear; loop: true;';
+      //   entity.setAttribute('animation', newAnimation);
+      // }
+      
+      window.onload = function() {
+        updateAnimation();
+      };
+
+
+      /*
+       * Component for food menu item buttons.
+       */
+      AFRAME.registerComponent("menu-button", {
+        schema: {
+          item_id: { default: "0" },
+          link: {default: ""}
+        },
+
+        tick: function () {
+          var data = this.data;
+          var element = this.el;
+          const entity = document.querySelector('#animatedEntity');
+          const newAnimation_1 = 'property: rotation; to: 0 720 0; dur: 4000; easing: linear; loop: true;';
+          const newAnimation_2 = 'property: rotation; to: 0 -720 0; dur: 4000; easing: linear; loop: true;';
+          const oringalAnimation_1 = 'property: rotation; to: 0 360 0; dur: 6000; easing: linear; loop: true;';
+          const oringalAnimation_2 = 'property: rotation; to: 0 -360 0; dur: 6000; easing: linear; loop: true;';
+          // Cursor enter: start or resume rotation animation, depending on prior animation state
+          element.addEventListener("mouseenter", function () {
+            
+            switch (data.item_id) {
+              case "1":
+                entity.setAttribute('animation', newAnimation_1);
+                
+                break;
+              case "2":
+                entity.setAttribute('animation', newAnimation_2);
+                
+                break;
+              default:
+                break;
+            }
+            
+          });
+
+          // Cursor leave: pause rotation animation
+          element.addEventListener("mouseleave", function () {
+            
+            
+            
+          });
+
+          // Cursor click: start the scale animation
+          element.addEventListener("click", function () {
+            window.location.href = data.link;
+          });
+          switch (data.item_id) {
+              case "1":
+                // icon_entity.setAttribute("gltf-model", "#model-burger");
+                // icon_entity.setAttribute('animation', 'property: rotation; to: 180 0 0; dur: 6000; easing: linear; loop: true');
+                break;
+              case "2":
+                // icon_entity.setAttribute("gltf-model", "#model-burger");
+                // icon_entity.setAttribute('animation', 'property: rotation; to: 0 0 180; dur: 6000; easing: linear; loop: true');
+                break;
+              default:
+                break;
+          }
+        
+        },
+      });
+    </script>
+    <style>
+      #video {
+          position: absolute;
+          left: -0.8;
+          top: -0.3;
+          transform: rotateY(20deg);
+          border: none;
+          object-fit: cover;
+          opacity: 0.8;
+          z-index: -1;
+      }
+    </style>
+
+  </head>
+  <body>
+    <a-scene>
+      <!-- Assets: 3D models and mixin definitions -->
+      <a-assets>
+        <a-asset-item id="model-burger" src="https://cdn.glitch.global/b13a6834-478e-4e84-9ad0-110a39c92297/robot_love_death_and_robots.glb?v=1679665437726"></a-asset-item>
+        
+        <img id="sky" src="https://cdn.glitch.global/b13a6834-478e-4e84-9ad0-110a39c92297/pexels-pixabay-2150.jpg?v=1679754611606">
+        
+        <!-- Target sphere surrounding each menu item -->
+        <a-mixin id="item-sphere" button geometry="primitive: sphere;" material="color: white; opacity: 0;" scale="0.15 0.15 0.15"
+                 animation="property: components.material.material.color; type: color; from: green; to: white; dur: 500; loop: false; easing: linear; startEvents: flash-begin;"></a-mixin>
+        
+        <!-- 3D model icon for menu items -->
+        <a-mixin id="item-icon"
+                 animation__hover="property: scale: 0.9 0.9 0.9; rotation; to: 0 360 0; dur: 400             0; easing: linear; loop: true; startEvents: rotation-begin; pauseEvents: rotation-pause; resumeEvents: rotation-resume;"
+             animation__click="property: scale; from: 0.5 0.5 0.5; to: 0.9 0.9 0.9; dur: 500; easing: linear; loop: false; startEvents: scale-begin;"></a-mixin>
+    
+        <!-- Text label for menu items -->
+        <a-mixin id="item-label" geometry="primitive: plane;" material="opacity: 0.0;" scale="1.5 1.5 1.5" text="align: center; anchor: center; baseline: center; color: white; wrap-count: 10;"></a-mixin>
+        <img id="games-img" src="https://cdn.glitch.global/f2c7befe-f8b2-4672-8f78-73bf75fad2aa/anime_backgroud.png?v=1676898119676">
+        <img id="achievement-img" src="https://cdn.glitch.global/f2c7befe-f8b2-4672-8f78-73bf75fad2aa/download-1.png?v=1676903378126">
+      </a-assets>
+
+      <!-- Sky fills the background with a solid colour -->
+      <a-sky src="#sky"></a-sky>
+      
+
+      <!-- Create cursor with animated visual feedback -->
+      <a-entity camera look-controls wasd-controls position="0 1.6 0">
+        <a-entity cursor="fuse: true; fuseTimeout: 800" raycaster="objects: .selectable"
+              material="color: white; shader: flat; opacity: 0.8;" position="0 0 -0.1"
+              geometry="primitive: ring; radiusInner: 0.002; radiusOuter: 0.004"
+              animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 500; from: 0.2 0.2 0.2; to: 1 1 1"
+              animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 800; from: 1 1 1; to: 0.2 0.2 0.2"
+              animation__mouseleave="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 100; to: 1 1 1">
+        </a-entity>
+      </a-entity>
+
+  
+      <a-plane id="info_box" position="0 1.6 -3" rotation="0 0 0" width="2" height="2" color="#005C8A">
+        <a-entity position="0 0.9 0.1" text="align:center; color: white; font: roboto; height: 0.3; width: 1.5; value: Welcome to XXX rolling app!"></a-entity>
+        <a-entity position="-0.7 0.5 0.1">
+          <a-image src="#games-img" width="0.3" height="0.3"></a-image>
+          <a-entity position="1 0 0" text="align:left; color: white; font: roboto; height: 0.15; width: 1.2; value: Roller-skiing games:\n- Challenge yourself to different levels\n- Compete with others online\n- Unlock new courses and game modes"></a-entity>
+        </a-entity>
+        <a-entity position="-0.7 0.1 0.1">
+          <a-image src="#achievement-img" width="0.3" height="0.3"></a-image>
+          <a-entity position="1 0 0" text="align:left; color: white; font: roboto; height: 0.15; width: 1.2; value: Achievement system:\n- Complete challenges and earn rewards\n- Track your progress and compare with friends\n- Level up and unlock exclusive content"></a-entity>
+        </a-entity>
+        <a-plane width="1.8" height="0.01" position="0 -0.2 0.1" color="white"></a-plane>
+        <a-entity position="0 -0.4 0.1" text="align:center; color: white; font: roboto; height: 0.1; width: 1.8; value: Download the app now!"></a-entity>
+      </a-plane>
+      
+      <a-plane id="info_box1"  position="2.6 1.6 -2.8" rotation="0 -20 0" >
+        <a-text id="info_text" align="left" baseline="top" position="-0.8 0.8 0.05" scale="0.5 0.5 1.0" value="start-up video\n"></a-text>
+
+        <!-- Video player -->
+        <a-video src="https://cdn.glitch.global/f2c7befe-f8b2-4672-8f78-73bf75fad2aa/Por%20skating%20practice%20%23skating%20%23inlineskating%20%23rollerskating%20%23skate%20%23trending%20%23trand%20%23shorts.mp4?v=1679331777708" width="2" height="2" position="0 0 0.1" loop="false" crossorigin="anonymous" playsinline></a-video>
+
+        <!-- Decorative line -->
+        <a-plane width="1.6" height="0.01" position="0 0.7 0.05" color: white></a-plane>
+      </a-plane>
+      
+      <a-entity id="menu-items" position="-2.6 1.6 -2.8" rotation="0 20 0">
+        <a-plane id="info_robot" width="0.7" height="0.2"  position="-0.4 0.5 0" color="#005C8A">
+          <a-entity position="0.3 0 0" text="align:left; color: white; font: roboto; height: 0.15; width: 1.2; value: 
+                                           Hello! How can I help you?\n
+                                           "></a-entity>
+        </a-plane>
+        <a-plane mixin="item-icon" class="icon" id="select-plane" width="0.3" height="0.2"  position="-0.2 0.1 0" color="#005C8A">
+          <a-sphere menu-button="item_id: 1; link: nevigate.html" mixin="item-sphere" class="selectable" position="0 0 0" rotation="0 0 0">
+            <a-entity position="5.5 0 0" text="align:left; color: white; font: roboto; height: 0.15; width: 1.2; value: 
+                                           Exit\n
+                                           " scale = "10 10 10 "></a-entity>
+          </a-sphere>  
+        </a-plane>
+        
+        <a-plane mixin="item-icon" class="icon" id="select-plane-2" width="0.3" height="0.2"  position="-0.6 0.1 0" color="#005C8A">
+          <a-sphere menu-button="item_id: 2; link: tourial.html" mixin="item-sphere" class="selectable" position="0 0 0" rotation="0 0 0">
+            <a-entity position="3.9 0 0" text="align:left; color: white; font: roboto; height: 0.15; width: 1.2; value: Tutorial\n
+                                           " scale = "8 8 8"></a-entity>
+          </a-sphere>  
+        </a-plane>
+        
+        <a-entity id="animatedEntity" gltf-model="#model-burger" position="0.5 -0.2 0" scale="0.002 0.002 0.002" animation="property: rotation; to: 0 360 0; dur: 6000; easing: linear; loop: true;"></a-entity>
+
+      </a-entity>
+      
+    </a-scene>
+  </body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="aframe-extras.controls.min.js"></script>
+    <script>
+      function formatPosition(p) {
+        return p.x.toFixed(1) + ", " + p.y.toFixed(1) + ", " + p.z.toFixed(1);
+      }
+      
+      AFRAME.registerComponent("hud", {
+        tick: function() {
+          var camera = this.el.sceneEl.querySelector("#person");
+          var camera_position = camera.getAttribute("position");
+          var camera_rotation = camera.querySelector("[camera]").getAttribute("rotation");
+          
+          this.el.querySelector("#hud-position").setAttribute("text", "value: " + formatPosition(camera_position));
+        },
+      });
+      
+      AFRAME.registerComponent("geofence", {
+        schema: {
+          x1: {default: 0.0},
+          z1: {default: 0.0},
+          x2: {default: 0.0},
+          z2: {default: 0.0},
+          url: {default: ''},
+        },
+        
+        tick: function() {
+          // Reference to schema
+          var data = this.data;
+          
+          // We need the camera to determine where the user is located and looking
+          var camera = this.el.sceneEl.querySelector("#person");
+          var camera_position = camera.getAttribute("position");
+          
+          // TASK 4: determine if the user is inside the geofence
+          var inside = (camera_position.x >= data.x1 && camera_position.x <= data.x2) && (camera_position.z >= data.z2 && camera_position.z <= data.z1);
+          if (inside) {
+            window.location.href = data.url;
+            
+          } else {
+            document.querySelector("#cursor").setAttribute("material", "color: black");
+          }
+        },
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene>
+      <!-- modles insert and mixin templete -->
+      <a-assets>
+        <a-asset-item id="city" src="https://cdn.glitch.global/b9be12ea-d992-4c31-a966-c33a6ba3dd1a/whole_city.glb?v=1677499657422"></a-asset-item>
+        <a-asset-item id="board-intro" src="https://cdn.glitch.global/b9be12ea-d992-4c31-a966-c33a6ba3dd1a/text-board.glb?v=1677510405736"></a-asset-item>
+        <a-asset-item id="board-game" src="https://cdn.glitch.global/b9be12ea-d992-4c31-a966-c33a6ba3dd1a/text-board.glb?v=1677510405736"></a-asset-item>
+        <a-mixin id="menu-items" geometry="width: 1.2; height: 0.7;" material="color: grey" text="align: center; color: red; anchor: center; baseline: center; wrap-count: 13;"></a-mixin>
+        <a-mixin id="building-name" material="opacity: 0.0; transparent: true;" scale="5 5 5"
+                 text="font: mozillavr; align: center; anchor: center; baseline: center; color: white; wrap-count: 20;"
+                 ></a-mixin>
+      </a-assets>
+      
+      <!-- curser setting -->
+      <a-entity id="person" movement-controls="controls: keyboard, touch;">
+        <a-entity hud camera look-controls wasd-controls="acceleration: 4" position="0 1.6 0">
+          <a-entity id="cursor" cursor="fuse: true; fuseTimeout: 800" raycaster="objects: .selectable"
+                    material="color: black; shader: flat; opacity: 0.8;" position="0 0 -0.1"
+                    geometry="primitive: ring; radiusInner: 0.002; radiusOuter: 0.004"
+                    animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 500; from: 0.2 0.2 0.2; to: 1 1 1"
+                    animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 800; from: 1 1 1; to: 0.2 0.2 0.2"
+                    animation__mouseleave="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 100; to: 1 1 1">
+          </a-entity>
+          
+          <!-- HUD position label -->
+          <a-entity id="hud-position" text="value: 0.0, 0.0, 0.0; align: center; anchor: center; baseline: center; color: black; opacity: 0.8; wrap-count: 20;" position="0 -0.02 -0.2" scale="0.1 0.1 0.1"></a-entity>
+        </a-entity>
+      </a-entity>
+      <!-- town module, the sky and ground -->
+      <a-entity gltf-model="#city" position="15.5 -1.5 -22" scale="1 1 1" rotation="0 0 0"></a-entity>
+      <a-entity gltf-model="#board-intro" position="1.3 -0.9 -9.5" scale="0.8 0.8 0.8" rotation="0 0 0"></a-entity>
+      <a-entity gltf-model="#board-game" position="5.5 -0.9 -8.8" scale="0.8 0.8 0.8" rotation="0 -90 0"></a-entity>
+      <a-sky color="#690C0C"></a-sky>
+      <a-plane rotation="-90 0 0" position="0 -1 0" width="200" height="200" color="#6EBAA7"></a-plane>
+      
+      <!-- building name show on the board -->
+      <a-entity mixin="building-name" text="value: Intro;" position="1.35 1.05 -13.2"></a-entity>
+      <a-entity mixin="building-name" text="value: Game;" position="9.3 1.05 -8.82" rotation="0 -90 0"></a-entity>
+      
+      <!-- link to another page -->
+      <a-entity geofence="x1: -0.7; z1: -13.3; x2: 4.3; z2: -17.4; url: intro.html"></a-entity>
+      <a-entity geofence="x1: 10.2; z1: -9.5; x2: 16.5; z2: -15.3; url: gamecenter.html"></a-entity>
+
+    </a-scene>
+  </body>
+</html>
